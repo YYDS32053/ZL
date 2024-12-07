@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 终止脚本，如果有任何命令失败
-set -
+set -cc
 
 # 检查是否为root用户
 if [ "$(id -u)" -ne 0 ]; then
