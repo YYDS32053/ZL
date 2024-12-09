@@ -3,18 +3,28 @@
 # 终止脚本，如果有任何命令失败
 set -e
 
+# 禁用交互界面
+export DEBIAN_FRONTEND=noninteractive
+
 # 检查是否为root用户
 if [ "$(id -u)" -ne 0 ]; then
   echo "错误: 请以root权限运行此脚本"
   exit 1
 fi
 
+# 检查是否已经安装 curl 和 lsb-release，避免重复安装
+if ! command -v curl &>/dev/null; then
+  echo "错误: curl 未安装。请手动安装 curl 或确保系统中已有它。"
+  exit 1
+fi
+
+if ! command -v lsb_release &>/dev/null; then
+  echo "错误: lsb_release 未安装。请手动安装 lsb-release 或确保系统中已有它。"
+  exit 1
+fi
+
 echo "正在更新系统软件包..."
 apt update -y && apt upgrade -y
-
-# 安装必需的依赖项
-echo "正在安装依赖项..."
-apt install -y apt-transport-https ca-certificates curl software-properties-common
 
 # 添加Docker官方GPG密钥
 echo "正在添加Docker官方GPG密钥..."
