@@ -24,7 +24,7 @@ if ! command -v lsb_release &>/dev/null; then
 fi
 
 echo "正在更新系统软件包..."
-apt update -y && apt upgrade -y
+apt update -y
 
 # 添加Docker官方GPG密钥
 echo "正在添加Docker官方GPG密钥..."
