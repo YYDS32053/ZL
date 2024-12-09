@@ -12,48 +12,42 @@ if [ "$(id -u)" -ne 0 ]; then
   exit 1
 fi
 
-# 检查是否已经安装 curl 和 lsb-release，避免重复安装
-if ! command -v curl &>/dev/null; then
-  echo "错误: curl 未安装。请手动安装 curl 或确保系统中已有它。"
-  exit 1
-fi
-
-if ! command -v lsb_release &>/dev/null; then
-  echo "错误: lsb_release 未安装。请手动安装 lsb-release 或确保系统中已有它。"
-  exit 1
-fi
-
+# 更新系统软件包索引
 echo "正在更新系统软件包..."
-apt update -y
+sudo apt update -y
 
-# 添加Docker官方GPG密钥
-echo "正在添加Docker官方GPG密钥..."
-curl -fsSL https://download.docker.com/linux/debian/gpg | tee /etc/apt/trusted.gpg.d/docker.asc > /dev/null
+# 安装 Docker 所需的最小依赖项（curl 和 ca-certificates）
+echo "正在安装必需依赖项..."
+sudo apt install -y ca-certificates curl
 
-# 添加Docker仓库
-echo "正在添加Docker仓库..."
-add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable" -y
+# 添加 Docker 官方 GPG 密钥
+echo "正在添加 Docker 官方 GPG 密钥..."
+curl -fsSL https://download.docker.com/linux/debian/gpg | sudo tee /etc/apt/trusted.gpg.d/docker.asc > /dev/null
 
-# 更新APT包索引
-echo "正在更新APT包索引..."
-apt update -y
+# 添加 Docker 仓库
+echo "正在添加 Docker 仓库..."
+echo "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-# 安装Docker
-echo "正在安装Docker..."
-apt install -y docker-ce docker-ce-cli containerd.io
+# 更新 APT 包索引
+echo "正在更新 APT 包索引..."
+sudo apt update -y
 
-# 启动并启用Docker
-echo "正在启动Docker并设置开机自启..."
-systemctl start docker
-systemctl enable docker
+# 安装 Docker 核心组件
+echo "正在安装 Docker 核心组件..."
+sudo apt install -y docker-ce
 
-# 检查Docker是否安装成功
-echo "正在检查Docker版本..."
-if docker --version &>/dev/null; then
-    echo "Docker安装成功！版本: $(docker --version)"
+# 启动并启用 Docker 服务
+echo "正在启动 Docker 服务并设置为开机自启..."
+sudo systemctl start docker
+sudo systemctl enable docker
+
+# 验证 Docker 是否安装成功
+echo "正在检查 Docker 版本..."
+if sudo docker --version &>/dev/null; then
+    echo "Docker 安装成功！"
 else
-    echo "错误: Docker安装失败。"
+    echo "错误: Docker 安装失败。"
     exit 1
 fi
 
-echo "Docker安装完成！"
+echo "Docker 安装完成!！"
