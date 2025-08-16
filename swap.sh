@@ -312,65 +312,78 @@ show_status() {
     echo ""
 }
 
-# 询问是否继续
-ask_continue() {
-    echo ""
-    echo -e "${Blue}是否继续使用脚本？${Font}"
-    read -p "输入 'y' 继续，其他任意键退出: " continue_choice
-    if [[ "$continue_choice" == "y" || "$continue_choice" == "Y" ]]; then
-        main
-    else
-        echo -e "${Green}感谢使用，再见！${Font}"
-        exit 0
-    fi
-}
-
 # 开始菜单
 main() {
-    clear
-    echo -e "———————————————————————————————————————"
-    echo -e "${Green}Linux VPS 一键管理Swap脚本 v2.0${Font}"
-    echo -e "———————————————————————————————————————"
-    show_status
-    echo -e "${Green}1、添加Swap${Font}"
-    echo -e "${Green}2、删除Swap${Font}"
-    echo -e "${Green}3、调整Swap大小${Font}"
-    echo -e "${Green}4、查看当前状态${Font}"
-    echo -e "${Green}0、退出脚本${Font}"
-    echo -e "———————————————————————————————————————"
-    read -p "请输入数字 [0-4]: " num
+    while true; do
+        echo ""
+        echo "======================================="
+        echo "Linux VPS 一键管理Swap脚本 v2.1"
+        echo "======================================="
 
-    case "$num" in
-    1)
-        add_swap
-        ask_continue
-        ;;
-    2)
-        del_swap
-        ask_continue
-        ;;
-    3)
-        resize_swap
-        ask_continue
-        ;;
-    4)
-        show_status
-        ask_continue
-        ;;
-    0)
-        echo -e "${Green}感谢使用，再见！${Font}"
-        exit 0
-        ;;
-    *)
-        echo -e "${Red}输入错误，请输入正确的数字 [0-4]${Font}"
-        sleep 2
-        main
-        ;;
-    esac
+        # 显示当前状态
+        if check_swap_exists; then
+            echo "当前状态: Swap文件已存在"
+            swapon --show 2>/dev/null || echo "Swap信息获取失败"
+        else
+            echo "当前状态: 未发现Swap文件"
+        fi
+
+        echo ""
+        echo "1. 添加Swap"
+        echo "2. 删除Swap"
+        echo "3. 调整Swap大小"
+        echo "4. 查看详细状态"
+        echo "0. 退出脚本"
+        echo "======================================="
+
+        printf "请输入选择 [0-4]: "
+        read num
+
+        case "$num" in
+        1)
+            echo ""
+            add_swap
+            echo ""
+            printf "操作完成，按回车继续..."
+            read
+            ;;
+        2)
+            echo ""
+            del_swap
+            echo ""
+            printf "操作完成，按回车继续..."
+            read
+            ;;
+        3)
+            echo ""
+            resize_swap
+            echo ""
+            printf "操作完成，按回车继续..."
+            read
+            ;;
+        4)
+            echo ""
+            show_status
+            echo ""
+            printf "按回车继续..."
+            read
+            ;;
+        0)
+            echo "感谢使用，再见！"
+            exit 0
+            ;;
+        *)
+            echo "输入错误，请输入 0-4 之间的数字"
+            sleep 1
+            ;;
+        esac
+    done
 }
 
 # 初始化脚本
+echo "正在初始化..."
 root_need
 check_virtualization
+echo ""
 
 main
