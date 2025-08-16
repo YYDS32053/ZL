@@ -314,70 +314,59 @@ show_status() {
 
 # 开始菜单
 main() {
-    while true; do
+    echo ""
+    echo "======================================="
+    echo "Linux VPS 一键管理Swap脚本 v2.1"
+    echo "======================================="
+
+    # 显示当前状态
+    if check_swap_exists; then
+        echo "当前状态: Swap文件已存在"
+        swapon --show 2>/dev/null || echo "Swap信息获取失败"
+    else
+        echo "当前状态: 未发现Swap文件"
+    fi
+
+    echo ""
+    echo "1. 添加Swap"
+    echo "2. 删除Swap"
+    echo "3. 调整Swap大小"
+    echo "4. 查看详细状态"
+    echo "0. 退出脚本"
+    echo "======================================="
+
+    printf "请输入选择 [0-4]: "
+    read num
+
+    case "$num" in
+    1)
         echo ""
-        echo "======================================="
-        echo "Linux VPS 一键管理Swap脚本 v2.1"
-        echo "======================================="
-
-        # 显示当前状态
-        if check_swap_exists; then
-            echo "当前状态: Swap文件已存在"
-            swapon --show 2>/dev/null || echo "Swap信息获取失败"
-        else
-            echo "当前状态: 未发现Swap文件"
-        fi
-
+        add_swap
+        ;;
+    2)
         echo ""
-        echo "1. 添加Swap"
-        echo "2. 删除Swap"
-        echo "3. 调整Swap大小"
-        echo "4. 查看详细状态"
-        echo "0. 退出脚本"
-        echo "======================================="
+        del_swap
+        ;;
+    3)
+        echo ""
+        resize_swap
+        ;;
+    4)
+        echo ""
+        show_status
+        ;;
+    0)
+        echo "感谢使用，再见！"
+        exit 0
+        ;;
+    *)
+        echo "输入错误，请输入 0-4 之间的数字"
+        exit 1
+        ;;
+    esac
 
-        printf "请输入选择 [0-4]: "
-        read num
-
-        case "$num" in
-        1)
-            echo ""
-            add_swap
-            echo ""
-            printf "操作完成，按回车继续..."
-            read
-            ;;
-        2)
-            echo ""
-            del_swap
-            echo ""
-            printf "操作完成，按回车继续..."
-            read
-            ;;
-        3)
-            echo ""
-            resize_swap
-            echo ""
-            printf "操作完成，按回车继续..."
-            read
-            ;;
-        4)
-            echo ""
-            show_status
-            echo ""
-            printf "按回车继续..."
-            read
-            ;;
-        0)
-            echo "感谢使用，再见！"
-            exit 0
-            ;;
-        *)
-            echo "输入错误，请输入 0-4 之间的数字"
-            sleep 1
-            ;;
-        esac
-    done
+    echo ""
+    echo "操作完成！如需继续操作，请重新运行脚本。"
 }
 
 # 初始化脚本
