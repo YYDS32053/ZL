@@ -41,6 +41,10 @@ echo "正在启动 Docker 服务并设置为开机自启..."
 sudo systemctl start docker
 sudo systemctl enable docker
 
+sudo curl -L "https://github.com/docker/compose/releases/download/v2.27.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+docker-compose --version
+
 # 验证 Docker 是否安装成功
 echo "正在检查 Docker 版本..."
 if sudo docker --version &>/dev/null; then
