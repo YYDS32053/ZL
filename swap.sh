@@ -312,50 +312,65 @@ show_status() {
     echo ""
 }
 
+# 询问是否继续
+ask_continue() {
+    echo ""
+    echo -e "${Blue}是否继续使用脚本？${Font}"
+    read -p "输入 'y' 继续，其他任意键退出: " continue_choice
+    if [[ "$continue_choice" == "y" || "$continue_choice" == "Y" ]]; then
+        main
+    else
+        echo -e "${Green}感谢使用，再见！${Font}"
+        exit 0
+    fi
+}
+
 # 开始菜单
 main() {
-    root_need
-    check_virtualization
+    clear
+    echo -e "———————————————————————————————————————"
+    echo -e "${Green}Linux VPS 一键管理Swap脚本 v2.0${Font}"
+    echo -e "———————————————————————————————————————"
+    show_status
+    echo -e "${Green}1、添加Swap${Font}"
+    echo -e "${Green}2、删除Swap${Font}"
+    echo -e "${Green}3、调整Swap大小${Font}"
+    echo -e "${Green}4、查看当前状态${Font}"
+    echo -e "${Green}0、退出脚本${Font}"
+    echo -e "———————————————————————————————————————"
+    read -p "请输入数字 [0-4]: " num
 
-    while true; do
-        clear
-        echo -e "———————————————————————————————————————"
-        echo -e "${Green}Linux VPS 一键管理Swap脚本 v2.0${Font}"
-        echo -e "———————————————————————————————————————"
+    case "$num" in
+    1)
+        add_swap
+        ask_continue
+        ;;
+    2)
+        del_swap
+        ask_continue
+        ;;
+    3)
+        resize_swap
+        ask_continue
+        ;;
+    4)
         show_status
-        echo -e "${Green}1、添加Swap${Font}"
-        echo -e "${Green}2、删除Swap${Font}"
-        echo -e "${Green}3、调整Swap大小${Font}"
-        echo -e "${Green}4、查看当前状态${Font}"
-        echo -e "${Green}0、退出脚本${Font}"
-        echo -e "———————————————————————————————————————"
-        read -p "请输入数字 [0-4]: " num
-
-        case "$num" in
-        1)
-            add_swap
-            ;;
-        2)
-            del_swap
-            ;;
-        3)
-            resize_swap
-            ;;
-        4)
-            show_status
-            ;;
-        0)
-            echo -e "${Green}感谢使用，再见！${Font}"
-            exit 0
-            ;;
-        *)
-            echo -e "${Red}输入错误，请输入正确的数字 [0-4]${Font}"
-            ;;
-        esac
-
-        echo ""
-        read -p "按回车键继续..."
-    done
+        ask_continue
+        ;;
+    0)
+        echo -e "${Green}感谢使用，再见！${Font}"
+        exit 0
+        ;;
+    *)
+        echo -e "${Red}输入错误，请输入正确的数字 [0-4]${Font}"
+        sleep 2
+        main
+        ;;
+    esac
 }
+
+# 初始化脚本
+root_need
+check_virtualization
 
 main
