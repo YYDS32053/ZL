@@ -79,7 +79,7 @@ check_virtualization() {
 add_swap() {
     echo -e "${Green}请输入需要添加的Swap大小（单位：MB），建议为内存的2倍！${Font}"
     echo -e "${Blue}提示：建议范围 128MB - 32768MB${Font}"
-    read -p "请输入Swap大小: " swapsize
+    read -p "请输入Swap大小: " swapsize < /dev/tty
 
     # 验证用户输入
     if ! validate_input "$swapsize"; then
@@ -100,7 +100,7 @@ add_swap() {
     # 大容量swap确认
     if [[ $swapsize -gt 8192 ]]; then
         echo -e "${Yellow}警告：您要创建的Swap文件较大（${swapsize}MB），确认继续吗？${Font}"
-        read -p "输入 'yes' 确认: " confirm
+        read -p "输入 'yes' 确认: " confirm < /dev/tty
         if [[ "$confirm" != "yes" ]]; then
             echo -e "${Yellow}操作已取消。${Font}"
             return 0
@@ -176,7 +176,7 @@ del_swap() {
 
     # 二次确认
     echo -e "${Yellow}警告：即将删除Swap文件，此操作不可逆！${Font}"
-    read -p "输入 'yes' 确认删除: " confirm
+    read -p "输入 'yes' 确认删除: " confirm < /dev/tty
     if [[ "$confirm" != "yes" ]]; then
         echo -e "${Yellow}操作已取消。${Font}"
         return 0
@@ -221,7 +221,7 @@ resize_swap() {
     echo ""
     echo -e "${Green}请输入新的Swap大小（单位：MB）：${Font}"
     echo -e "${Blue}提示：建议范围 128MB - 32768MB${Font}"
-    read -p "请输入新的Swap大小: " newsize
+    read -p "请输入新的Swap大小: " newsize < /dev/tty
 
     # 验证用户输入
     if ! validate_input "$newsize"; then
@@ -236,7 +236,7 @@ resize_swap() {
     # 大容量swap确认
     if [[ $newsize -gt 8192 ]]; then
         echo -e "${Yellow}警告：您要创建的Swap文件较大（${newsize}MB），确认继续吗？${Font}"
-        read -p "输入 'yes' 确认: " confirm
+        read -p "输入 'yes' 确认: " confirm < /dev/tty
         if [[ "$confirm" != "yes" ]]; then
             echo -e "${Yellow}操作已取消。${Font}"
             return 0
@@ -336,7 +336,7 @@ main() {
     echo "======================================="
 
     printf "请输入选择 [0-4]: "
-    read num
+    read num < /dev/tty
 
     case "$num" in
     1)
