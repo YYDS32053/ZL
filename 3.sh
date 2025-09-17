@@ -1,12 +1,8 @@
 #!/bin/bash
 
 # 脚本功能: 在 Ubuntu 24.04 (Noble Numbat) 及兼容系统上安装 Docker Engine 和 Docker Compose 插件
-# 优化点:
-# 1. 使用官方推荐的 Ubuntu 软件源，而非错误的 Debian 源。
-# 2. 采用更安全的 GPG 密钥管理方式。
-# 3. 安装现代的 Docker Compose 插件 (docker compose)，而非旧的独立二进制文件 (docker-compose)。
-# 4. 增加了更完善的依赖项和完整的 Docker 组件安装。
-# 5. 使用更可靠的验证方式。
+# 新增优化:
+# 6.5. 自动配置国内镜像加速器，解决国内拉取镜像慢或失败的问题。
 
 # 终止脚本，如果有任何命令失败
 set -e
@@ -47,22 +43,30 @@ apt-get update
 echo "正在安装 Docker Engine 和 Docker Compose 插件..."
 apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
+# ------------------------- 新增功能 -------------------------
+# 6.5. 配置 Docker 镜像加速器
+echo "正在配置国内镜像加速器..."
+mkdir -p /etc/docker
+tee /etc/docker/daemon.json <<-'EOF'
+{
+  "registry-mirrors": ["https://docker.m.daocloud.io"]
+}
+EOF
+# -----------------------------------------------------------
+
 # 7. 验证 Docker 是否安装并运行成功
+# 注意：配置加速器后，需要重启Docker服务才能生效
+echo "正在重启 Docker 服务以应用镜像加速器配置..."
+systemctl restart docker
+
 echo "正在通过运行 hello-world 容器来验证 Docker 安装..."
 if docker run hello-world &>/dev/null; then
     echo -e "\n✅ Docker Engine 安装成功并已正确运行！"
 else
     echo -e "\n❌ 错误: Docker Engine 安装失败或无法运行。"
-    # 尝试启动服务并重试
-    echo "尝试启动 Docker 服务..."
-    systemctl start docker
-    systemctl enable docker
-    if docker run hello-world &>/dev/null; then
-         echo -e "\n✅ Docker 服务启动后，验证成功！"
-    else
-         echo -e "\n❌ 错误: 启动服务后依然无法运行 hello-world 容器。"
-         exit 1
-    fi
+    # 如果重启后仍然失败，可能是其他问题
+    echo "请检查服务日志: sudo journalctl -u docker.service"
+    exit 1
 fi
 
 # 8. 验证 Docker Compose 插件版本
